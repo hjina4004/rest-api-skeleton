@@ -4,6 +4,9 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class PostService {
 
   private final PostRepository postRepository;
+  private final CacheManager cacheManager;
 
   public Page<Post> findAll(Pageable pageable) {
     return postRepository.findAll(pageable);
@@ -59,18 +63,23 @@ public class PostService {
     return postRepository.save(post).getSlug();
   }
 
-  public Optional<Post> findBySlug(String slug) {
+  @Cacheable(value = "post-single", key = "#slug")
+  public Optional<Post> show(String slug) {
     return postRepository.findBySlug(slug);
   }
 
-  public Post update(Long id, PostUpdateDto dto) {
-    Optional<Post> optionalPost = postRepository.findById(id);
+  @CacheEvict(value = "post-single", key = "#slug")
+  public Post update(String slug, PostUpdateDto dto) {
+    Optional<Post> optionalPost = postRepository.findBySlug(slug);
     Post updatedPost = null;
     if (optionalPost.isPresent()) {
       updatedPost = optionalPost.get();
-      String slug = dto.getSlug();
-      if (!"".equals(slug) && !updatedPost.getSlug().equals(slug))
-        updatedPost.setSlug(toSlug(slug));
+      String updatedSlug = dto.getSlug();
+      if (!slug.equals(updatedSlug)) {
+        updatedSlug = toSlug(updatedSlug);
+        cacheManager.getCache("post-single").evict(updatedSlug);
+        updatedPost.setSlug(updatedSlug);
+      }
       if (!"".equals(dto.getTitle()))
         updatedPost.setTitle(dto.getTitle());
       if (!"".equals(dto.getContents()))
@@ -82,8 +91,9 @@ public class PostService {
     return updatedPost;
   }
 
-  public String destory(Long id) {
-    Optional<Post> optionalPost = postRepository.findById(id);
+  @CacheEvict(value = "post-single", key = "#slug")
+  public String destory(String slug) {
+    Optional<Post> optionalPost = postRepository.findBySlug(slug);
     if (!optionalPost.isPresent())
       return "fail";
 

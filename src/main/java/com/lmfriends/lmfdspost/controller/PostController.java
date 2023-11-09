@@ -1,7 +1,6 @@
 package com.lmfriends.lmfdspost.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import org.json.simple.JSONObject;
@@ -56,7 +55,7 @@ public class PostController {
   public ResponseEntity<ResponseDto<Post>> show(@PathVariable(value = "slug") String slug) {
     HttpStatus httpStatus = HttpStatus.NOT_FOUND;
     Post found = null;
-    Optional<Post> optionalPost = postService.findBySlug(slug);
+    Optional<Post> optionalPost = postService.show(slug);
     if (optionalPost.isPresent()) {
       found = optionalPost.get();
       httpStatus = HttpStatus.OK;
@@ -64,18 +63,18 @@ public class PostController {
     return new ResponseEntity<>(ResponseDto.res("success", found), httpStatus);
   }
 
-  @PutMapping("/posts/{id}")
-  public ResponseEntity<ResponseDto<Post>> update(@PathVariable(value = "id") Long id, PostUpdateDto dto) {
-    Post post = postService.update(id, dto);
+  @PutMapping("/posts/{slug}")
+  public ResponseEntity<ResponseDto<Post>> update(@PathVariable(value = "slug") String slug, PostUpdateDto dto) {
+    Post post = postService.update(slug, dto);
     String message = post != null ? "success" : "fail";
     HttpStatus httpStatus = post != null ? HttpStatus.OK : HttpStatus.NOT_FOUND;
 
     return new ResponseEntity<>(ResponseDto.res(message, post), httpStatus);
   }
 
-  @DeleteMapping("/posts/{id}")
-  public ResponseEntity<JSONObject> destory(@PathVariable(value = "id") Long id) {
-    String result = postService.destory(id);
+  @DeleteMapping("/posts/{slug}")
+  public ResponseEntity<JSONObject> destory(@PathVariable(value = "slug") String slug) {
+    String result = postService.destory(slug);
     HttpStatus httpStatus = "success".equals(result) ? HttpStatus.OK : HttpStatus.NOT_FOUND;
 
     HashMap<String, Object> map = new HashMap<String, Object>();

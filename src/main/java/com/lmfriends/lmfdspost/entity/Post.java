@@ -1,5 +1,6 @@
 package com.lmfriends.lmfdspost.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -27,7 +28,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "posts")
-public class Post {
+public class Post implements Serializable {
   
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

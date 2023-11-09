@@ -2,6 +2,12 @@ server:
     port: 8080
 
 spring:
+    cache:
+        type: redis
+        redis:
+            time-to-live: 600000
+            cache-null-values: true
+
     datasource:
         url: jdbc:mysql://homestead.test/lmfds_post?serverTimezone=Asia/Seoul&characterEncoding=utf-8
         username: homestead
@@ -15,3 +21,7 @@ spring:
             hibernate:
                 "[format_sql]": true
                 "[show_sql]": true
+    data:
+        redis:
+            host: homestead.test
+            port: 6379

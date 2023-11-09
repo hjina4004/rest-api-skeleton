@@ -3,6 +3,7 @@
 * Spring Boot 3.1.4
 * Java 17
 * Spring Data JPA
+* Spring Data Redis (for cache)
 
 
 ## REST api
@@ -30,7 +31,7 @@
 
 * post 수정 [PUT]
   ```
-  /api/v1/posts/{id}
+  /api/v1/posts/{slug}
 
   {
     title:"세번째 포스트입니다.",
@@ -41,5 +42,5 @@
 
 * post 삭제 [DELETE]
   ```
-  /api/v1/posts/{id}
+  /api/v1/posts/{slug}
   ```
